@@ -12,18 +12,18 @@ const DefaultLoveMax = 4
 const DefaultDeplete = time.Duration(15 * time.Minute)
 
 type Gotchi struct {
-	Type string `json:"type"`
-	Hatched bool `json:"hatched"`
-	Food int `json:"food"`
-	FoodMax int `json:"food_max"`
-	FoodTicker *time.Ticker `json:"-"`
-	Love int `json:"love"`
-	LoveMax int `json:"love_max"`
-	LoveTicker *time.Ticker `json:"-"`
-	Level int `json:"level"`
-	DepleteInt int `json:"deplete_int"`
-	DepleteDuration time.Duration `json:"deplete_duration"`
-	Inventory map[string]int `json:"inventory"`
+	Type            string         `json:"type"`
+	Hatched         bool           `json:"hatched"`
+	Food            int            `json:"food"`
+	FoodMax         int            `json:"food_max"`
+	FoodTicker      *time.Ticker   `json:"-"`
+	Love            int            `json:"love"`
+	LoveMax         int            `json:"love_max"`
+	LoveTicker      *time.Ticker   `json:"-"`
+	Level           int            `json:"level"`
+	DepleteInt      int            `json:"deplete_int"`
+	DepleteDuration time.Duration  `json:"deplete_duration"`
+	Inventory       map[string]int `json:"inventory"`
 }
 
 func StartGotchi(species string, foodmax string, lovemax string, deplete string,
@@ -78,12 +78,21 @@ func (this *Gotchi) Print() {
 	log.Debugf("%s", string(output))
 }
 
+func (this *Gotchi) UpdateAll() {
+	jsonRepr, err := json.Marshal(this)
+	if err != nil {
+		log.Errorf("couldn't unmarshal: %v", err)
+	}
+	hub.broadcast <- jsonRepr
+}
+
 func (this *Gotchi) PrintOutLoop() {
 	printoutTicker := time.NewTicker(15 * time.Second)
 	for {
 		select {
 		case <-printoutTicker.C:
 			this.Print()
+			this.UpdateAll()
 		}
 	}
 }

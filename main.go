@@ -2,8 +2,8 @@ package main
 
 import (
 	"encoding/json"
-	"golang.org/x/oauth2"
 	log "github.com/sirupsen/logrus"
+	"golang.org/x/oauth2"
 	"strings"
 )
 
@@ -12,12 +12,14 @@ var StartGotchiChan chan bool
 var thisGotchi *Gotchi
 var Started bool
 var IsHatchedChan chan bool
+
 func init() {
 	log.SetLevel(log.DebugLevel)
 }
 
 func main() {
 	thisGotchi = new(Gotchi)
+	go StartWSS()
 	thisGotchi.Hatched = false
 	StartGotchiChan = make(chan bool)
 	IsHatchedChan = make(chan bool)
@@ -89,5 +91,3 @@ func ProcessBitsEvent(message WSMessage) (err error) {
 func ProcessSubscribeEvent(message WSMessage) (err error) {
 	return
 }
-
-

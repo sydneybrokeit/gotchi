@@ -1,15 +1,14 @@
 package main
 
 import (
+	"context"
 	"crypto/rand"
 	"encoding/hex"
 	"errors"
 	"fmt"
-	"context"
 	log "github.com/sirupsen/logrus"
 	"net/http"
 )
-
 
 type Handler func(http.ResponseWriter, *http.Request) error
 

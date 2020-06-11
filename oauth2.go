@@ -5,9 +5,9 @@ import (
 	"flag"
 	"fmt"
 	"github.com/gorilla/sessions"
-	"golang.org/x/oauth2"
-	log "github.com/sirupsen/logrus"
 	"github.com/hmschreck/envy"
+	log "github.com/sirupsen/logrus"
+	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/twitch"
 	"net/http"
 )
@@ -93,7 +93,6 @@ func OauthWebInterface() {
 			if err := handler(w, r); err != nil {
 				var errorString string = "Something went wrong! Please try again."
 				var errorCode int = 500
-
 
 				log.Println(err)
 				w.Write([]byte(errorString))
