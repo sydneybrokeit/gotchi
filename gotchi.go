@@ -78,8 +78,14 @@ func (this *Gotchi) Print() {
 	log.Debugf("%s", string(output))
 }
 
+type GotchiMessage struct {
+	Type string `json:"type"`
+	State Gotchi `json:"state,omitempty"`
+}
+
 func (this *Gotchi) UpdateAll() {
-	jsonRepr, err := json.Marshal(this)
+	update := GotchiMessage{State: *this, Type: "REFRESH"}
+	jsonRepr, err := json.Marshal(update)
 	if err != nil {
 		log.Errorf("couldn't unmarshal: %v", err)
 	}
