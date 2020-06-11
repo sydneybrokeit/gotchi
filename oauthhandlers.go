@@ -15,7 +15,7 @@ type Handler func(http.ResponseWriter, *http.Request) error
 func HandleRoot(w http.ResponseWriter, r *http.Request) (err error) {
 
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
-	if r.Method == http.MethodPost && thisGotchi.Hatched != true {
+	if r.Method == http.MethodPost && thisGotchi.Hatched != true && Started == true {
 		log.Warningf("starting the hatching!")
 		thisGotchi, err = StartGotchi(r.FormValue("species"),
 			r.FormValue("maxfood"),

@@ -14,7 +14,7 @@ var Started bool
 var IsHatchedChan chan bool
 
 func init() {
-	log.SetLevel(log.DebugLevel)
+	// log.SetLevel(log.DebugLevel)
 }
 
 func main() {

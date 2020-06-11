@@ -114,6 +114,8 @@ var upgrader = websocket.Upgrader{
 
 func WSSHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
+	log.Infof("received connection message for user id %s", vars["id"])
+	upgrader.CheckOrigin = func(r *http.Request) bool {return true}
 	conn, err := upgrader.Upgrade(w, r, nil)
 	if err != nil {
 		log.Errorf("%v", err)
