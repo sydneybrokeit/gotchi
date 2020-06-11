@@ -89,7 +89,8 @@ func (this *Gotchi) UpdateAll() {
 	if err != nil {
 		log.Errorf("couldn't unmarshal: %v", err)
 	}
-	hub.broadcast <- jsonRepr
+	log.Print(jsonRepr)
+	internalService.send(userId, string(jsonRepr))
 }
 
 func (this *Gotchi) PrintOutLoop() {

@@ -19,13 +19,13 @@ func init() {
 
 func main() {
 	thisGotchi = new(Gotchi)
-	go StartWSS()
 	thisGotchi.Hatched = false
 	StartGotchiChan = make(chan bool)
 	IsHatchedChan = make(chan bool)
 	go OauthWebInterface()
 	<-StartGotchiChan
 	Started = true
+	internalService = newService(*extensionId, userId, secret)
 	<-IsHatchedChan
 	go thisGotchi.Do()
 	var err error
