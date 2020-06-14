@@ -1,12 +1,15 @@
+let userId = "";
 
 console.log("in gotchi.js");
 window.Twitch.ext.onAuthorized(function(auth) {
     console.log("authenticated");
+    userId = auth.userId;
     console.log(auth);
     window.Twitch.ext.listen('broadcast', function (topic, contentType, message) {
         console.log("listener got a message!");
         handleMessage(message);
     });
+    
 });
 
 

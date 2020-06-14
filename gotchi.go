@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	log "github.com/sirupsen/logrus"
+	"net/http"
 	"strconv"
 	"time"
 )
@@ -13,6 +14,7 @@ const DefaultDeplete = time.Duration(15 * time.Minute)
 
 type Gotchi struct {
 	Type            string         `json:"type"`
+	ReadyToHatch	bool			`json:"ready_to_hatch"`
 	Hatched         bool           `json:"hatched"`
 	Food            int            `json:"food"`
 	FoodMax         int            `json:"food_max"`
@@ -102,4 +104,15 @@ func (this *Gotchi) PrintOutLoop() {
 			this.UpdateAll()
 		}
 	}
+}
+
+func HandleHatch(w http.ResponseWriter, r *http.Request) (err error){
+	if thisGotchi.ReadyToHatch != true || thisGotchi.Hatched == true {
+		http.Redirect(w, r, "/", http.StatusTemporaryRedirect)
+	} else {
+		thisGotchi.Hatch()
+		HatchChan <- true
+		http.Redirect(w, r, "/", http.StatusTemporaryRedirect)
+	}
+	return
 }

@@ -11,7 +11,8 @@ var outerToken *oauth2.Token
 var StartGotchiChan chan bool
 var thisGotchi *Gotchi
 var Started bool
-var IsHatchedChan chan bool
+var IsReadyToHatchChan chan bool
+var HatchChan chan bool
 
 func init() {
 	// log.SetLevel(log.DebugLevel)
@@ -21,12 +22,14 @@ func main() {
 	thisGotchi = new(Gotchi)
 	thisGotchi.Hatched = false
 	StartGotchiChan = make(chan bool)
-	IsHatchedChan = make(chan bool)
+	IsReadyToHatchChan = make(chan bool)
 	go OauthWebInterface()
 	<-StartGotchiChan
 	Started = true
 	internalService = newService(*extensionId, userId, secret)
-	<-IsHatchedChan
+	<-IsReadyToHatchChan
+	thisGotchi.ReadyToHatch = true
+	<-HatchChan
 	go thisGotchi.Do()
 	var err error
 	userId, err = getUserIdFromName("sydneythedev")

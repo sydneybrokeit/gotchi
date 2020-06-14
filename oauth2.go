@@ -109,6 +109,7 @@ func OauthWebInterface() {
 	handleFunc("/", HandleRoot)
 	handleFunc("/login", HandleLogin)
 	handleFunc("/redirect", HandleOAuth2Callback)
+	handleFunc("/hatch", HandleHatch)
 
 	fmt.Println("Started running on http://localhost:8080")
 	fmt.Println(http.ListenAndServe(":8080", nil))

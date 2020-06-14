@@ -28,13 +28,12 @@ func HandleRoot(w http.ResponseWriter, r *http.Request) (err error) {
 			http.Redirect(w, r, "/", http.StatusTemporaryRedirect)
 			return
 		}
-		thisGotchi.Hatch()
-		IsHatchedChan <- true
+		IsReadyToHatchChan <- true
 	}
 	w.WriteHeader(http.StatusOK)
 	if Started != true {
 		w.Write([]byte(`<html><body><a href="/login">Login using Twitch</a></body></html>`))
-	} else if thisGotchi.Hatched != true {
+	} else if thisGotchi.ReadyToHatch == false {
 		w.Write([]byte(`
 			<html><body><form method="POST">
 			<label>Species</label><br />
@@ -52,9 +51,14 @@ func HandleRoot(w http.ResponseWriter, r *http.Request) (err error) {
 			<input type="number" value="2" name="initial_food"><br />
 			<label>Initial Love</label><br />
 			<input type="number" value="2" name="initial_love"><br />
-			<input type="submit" value="Hatch!">
+			<input type="submit" value="Submit!">
 		`))
 	} else {
+		output := `<html><body>Running! <3'`
+		if thisGotchi.ReadyToHatch && thisGotchi.Hatched == false {
+			output += `<a href="/hatch">Hatch!</a>`
+		}
+		output += `</body></html>`
 		w.Write([]byte(`<html><body>I'm doing the thing!</body></html>`))
 	}
 	return
