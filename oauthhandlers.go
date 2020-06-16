@@ -15,7 +15,7 @@ type Handler func(http.ResponseWriter, *http.Request) error
 func HandleRoot(w http.ResponseWriter, r *http.Request) (err error) {
 
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
-	if r.Method == http.MethodPost && thisGotchi.Hatched != true && Started == true {
+	if r.Method == http.MethodPost && thisGotchi.Hatched != true && Started == true && thisGotchi.ReadyToHatch != true {
 		log.Warningf("starting the hatching!")
 		thisGotchi, err = StartGotchi(r.FormValue("species"),
 			r.FormValue("maxfood"),
@@ -29,11 +29,12 @@ func HandleRoot(w http.ResponseWriter, r *http.Request) (err error) {
 			return
 		}
 		IsReadyToHatchChan <- true
+		http.Redirect(w, r, "/", http.StatusTemporaryRedirect)
 	}
 	w.WriteHeader(http.StatusOK)
 	if Started != true {
 		w.Write([]byte(`<html><body><a href="/login">Login using Twitch</a></body></html>`))
-	} else if thisGotchi.ReadyToHatch == false {
+	} else if thisGotchi.ReadyToHatch == false  {
 		w.Write([]byte(`
 			<html><body><form method="POST">
 			<label>Species</label><br />

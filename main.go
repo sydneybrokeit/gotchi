@@ -19,6 +19,7 @@ func init() {
 }
 
 func main() {
+	go StartWSS()
 	thisGotchi = new(Gotchi)
 	thisGotchi.Hatched = false
 	StartGotchiChan = make(chan bool)
@@ -30,7 +31,7 @@ func main() {
 	<-IsReadyToHatchChan
 	thisGotchi.ReadyToHatch = true
 	<-HatchChan
-	go thisGotchi.Do()
+	// go thisGotchi.Do()
 	var err error
 	userId, err = getUserIdFromName("sydneythedev")
 	if err != nil {

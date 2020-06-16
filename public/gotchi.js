@@ -9,7 +9,7 @@ window.Twitch.ext.onAuthorized(function(auth) {
         console.log("listener got a message!");
         handleMessage(message);
     });
-    
+
 });
 
 

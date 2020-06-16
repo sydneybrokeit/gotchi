@@ -66,11 +66,71 @@ func StartGotchi(species string, foodmax string, lovemax string, deplete string,
 func (this *Gotchi) Hatch() {
 	log.Warning("hatching!")
 	this.Hatched = true
+	message := GotchiMessage{
+		Type: "HATCH",
+		State: this,
+	}
+	SendMessage(message)
+	go FoodTimers()
 }
+
+func FoodTimers() {
+	for {
+		select {
+		case <- thisGotchi.LoveTicker.C:
+			ChangeLove(-1)
+		case <- thisGotchi.FoodTicker.C:
+			ChangeFood(-1)
+		}
+	}
+}
+
+func ChangeLove(amount int) {
+	log.Debug("decrementing love")
+	thisGotchi.LoveTicker = time.NewTicker(thisGotchi.DepleteDuration)
+	thisGotchi.Love += amount
+	if thisGotchi.Love < 0 {
+		thisGotchi.Love = 0
+	} else if thisGotchi.Love > thisGotchi.LoveMax {
+		thisGotchi.Love = thisGotchi.LoveMax
+	} else {
+		message := GotchiMessage{
+			Type: "DELTA",
+			Delta: Delta{
+				Type: "love",
+				Amount: amount,
+			},
+		}
+		SendMessage(message)
+	}
+}
+
+func ChangeFood(amount int) {
+	log.Debug("decrementing food")
+	thisGotchi.FoodTicker = time.NewTicker(thisGotchi.DepleteDuration)
+	thisGotchi.Food += amount
+	if thisGotchi.Food < 0 {
+		thisGotchi.Food = 0
+	} else if thisGotchi.Food > thisGotchi.FoodMax {
+		thisGotchi.Food = thisGotchi.FoodMax
+	} else {
+		message := GotchiMessage{
+			Type: "DELTA",
+			Delta: Delta{
+				Type: "food",
+				Amount: amount,
+			},
+		}
+		SendMessage(message)
+	}
+}
+
 
 func (this *Gotchi) Do() {
 	go this.PrintOutLoop()
 }
+
+
 
 func (this *Gotchi) Print() {
 	output, err := json.MarshalIndent(this, "", "\t")
@@ -80,19 +140,25 @@ func (this *Gotchi) Print() {
 	log.Debugf("%s", string(output))
 }
 
+type Delta struct {
+	Type string `json:"type"`
+	Amount int `json:"amount"`
+}
+
 type GotchiMessage struct {
 	Type string `json:"type"`
-	State Gotchi `json:"state,omitempty"`
+	State *Gotchi `json:"state,omitempty"`
+	Delta Delta `json:"delta,omitempty"`
 }
 
 func (this *Gotchi) UpdateAll() {
-	update := GotchiMessage{State: *this, Type: "REFRESH"}
+	update := GotchiMessage{State: this, Type: "REFRESH"}
 	jsonRepr, err := json.Marshal(update)
 	if err != nil {
 		log.Errorf("couldn't unmarshal: %v", err)
 	}
 	log.Print(jsonRepr)
-	internalService.send(userId, string(jsonRepr))
+	// hub.broadcast <- jsonRepr
 }
 
 func (this *Gotchi) PrintOutLoop() {
@@ -106,6 +172,8 @@ func (this *Gotchi) PrintOutLoop() {
 	}
 }
 
+
+
 func HandleHatch(w http.ResponseWriter, r *http.Request) (err error){
 	if thisGotchi.ReadyToHatch != true || thisGotchi.Hatched == true {
 		http.Redirect(w, r, "/", http.StatusTemporaryRedirect)
@@ -114,5 +182,19 @@ func HandleHatch(w http.ResponseWriter, r *http.Request) (err error){
 		HatchChan <- true
 		http.Redirect(w, r, "/", http.StatusTemporaryRedirect)
 	}
+	return
+}
+
+// debugging endpoint for increasing "food"
+func HandleFeed(w http.ResponseWriter, r *http.Request) (err error) {
+	ChangeFood(1)
+	http.Redirect(w, r, "/", http.StatusTemporaryRedirect)
+	return
+}
+
+// debugging endpoint for increasing "love"
+func HandleLove(w http.ResponseWriter, r *http.Request) (err error) {
+	ChangeLove(1)
+	http.Redirect(w, r, "/", http.StatusTemporaryRedirect )
 	return
 }
