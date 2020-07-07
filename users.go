@@ -20,6 +20,7 @@ type TwitchUser struct {
 	} `json:"data"`
 }
 
+// pass in a username and get a userID
 func getUserIdFromName(name string) (userId string, err error) {
 	var user TwitchUser
 	requestUrl := fmt.Sprintf("https://api.twitch.tv/helix/users?login=%s", name)

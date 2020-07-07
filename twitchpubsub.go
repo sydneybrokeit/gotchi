@@ -30,7 +30,8 @@ func Reconnect() {
 
 func Subscribe() (err error) {
 	scopes := []string{
-		fmt.Sprintf("channel-bits-events-v2.%s", userId),
+		//fmt.Sprintf("channel-bits-events-v2.%s", userId),
+		fmt.Sprintf("channel-points-channel-v1.%s", userId),
 		// fmt.Sprintf("channel-subscribe-events-v1.%s", channelId),
 	}
 	data := WSData{

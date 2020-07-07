@@ -13,21 +13,34 @@ const DefaultLoveMax = 4
 const DefaultDeplete = time.Duration(15 * time.Minute)
 
 type Gotchi struct {
+	// species
 	Type            string         `json:"type"`
+	// is configured
 	ReadyToHatch	bool			`json:"ready_to_hatch"`
+	// has hatched
 	Hatched         bool           `json:"hatched"`
+	// current food
 	Food            int            `json:"food"`
+	// maximum food
 	FoodMax         int            `json:"food_max"`
+	// timer for food depletion
 	FoodTicker      *time.Ticker   `json:"-"`
+	// current love
 	Love            int            `json:"love"`
+	// maximum love
 	LoveMax         int            `json:"love_max"`
+	// timer for love depletion
 	LoveTicker      *time.Ticker   `json:"-"`
+	// level (1,2,3)
 	Level           int            `json:"level"`
 	DepleteInt      int            `json:"deplete_int"`
+	// basic depletion
 	DepleteDuration time.Duration  `json:"deplete_duration"`
+	// a map of user ids and their count of snacks
 	Inventory       map[string]int `json:"inventory"`
 }
 
+// from data passed in, provide a ready-to-hatch Gotchi
 func StartGotchi(species string, foodmax string, lovemax string, deplete string,
 	food string, love string) (output *Gotchi, err error) {
 	output = new(Gotchi)
@@ -63,6 +76,7 @@ func StartGotchi(species string, foodmax string, lovemax string, deplete string,
 	return
 }
 
+// hatch the Gotchi
 func (this *Gotchi) Hatch() {
 	log.Warning("hatching!")
 	this.Hatched = true
@@ -74,6 +88,8 @@ func (this *Gotchi) Hatch() {
 	go FoodTimers()
 }
 
+
+// handle the timers for food and love depletion
 func FoodTimers() {
 	for {
 		select {
@@ -85,10 +101,12 @@ func FoodTimers() {
 	}
 }
 
+// add the passed in amount to food count and update
 func ChangeLove(amount int) {
 	log.Debug("decrementing love")
 	thisGotchi.LoveTicker = time.NewTicker(thisGotchi.DepleteDuration)
 	thisGotchi.Love += amount
+	// bounds checking
 	if thisGotchi.Love < 0 {
 		thisGotchi.Love = 0
 	} else if thisGotchi.Love > thisGotchi.LoveMax {
@@ -105,10 +123,12 @@ func ChangeLove(amount int) {
 	}
 }
 
+// add the passed in amount to love count and update
 func ChangeFood(amount int) {
 	log.Debug("decrementing food")
 	thisGotchi.FoodTicker = time.NewTicker(thisGotchi.DepleteDuration)
 	thisGotchi.Food += amount
+	// bounds checking
 	if thisGotchi.Food < 0 {
 		thisGotchi.Food = 0
 	} else if thisGotchi.Food > thisGotchi.FoodMax {
@@ -174,6 +194,7 @@ func (this *Gotchi) PrintOutLoop() {
 
 
 
+// /hatch endpoint
 func HandleHatch(w http.ResponseWriter, r *http.Request) (err error){
 	if thisGotchi.ReadyToHatch != true || thisGotchi.Hatched == true {
 		http.Redirect(w, r, "/", http.StatusTemporaryRedirect)
