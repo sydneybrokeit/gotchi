@@ -80,6 +80,8 @@ func ProcessMessage(message WSMessage) (err error) {
 			err = ProcessBitsEvent(message)
 		case topic == "channel-subscribe-events-v1":
 			err = ProcessSubscribeEvent(message)
+		case topic == "channel-points-channel-v1":
+			err = ProcessPointsEvent(message)
 		default:
 			return
 		}
@@ -93,5 +95,9 @@ func ProcessBitsEvent(message WSMessage) (err error) {
 }
 
 func ProcessSubscribeEvent(message WSMessage) (err error) {
+	return
+}
+
+func ProcessPointsEvent(message WSMessage) (err error) {
 	return
 }
