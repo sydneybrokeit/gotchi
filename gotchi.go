@@ -166,9 +166,10 @@ type Delta struct {
 }
 
 type GotchiMessage struct {
-	Type string `json:"type"`
-	State *Gotchi `json:"state,omitempty"`
-	Delta Delta `json:"delta,omitempty"`
+	Type  string      `json:"type"`
+	State *Gotchi     `json:"state,omitempty"`
+	Delta Delta       `json:"delta,omitempty"`
+	Guess GuessStruct `json:"guess,omitempty"`
 }
 
 func (this *Gotchi) UpdateAll() {

@@ -13,10 +13,27 @@ var thisGotchi *Gotchi
 var Started bool
 var IsReadyToHatchChan chan bool
 var HatchChan chan bool
-
+var eventsMapping = map[string]func(message WSMessage) (err error){}
 func init() {
 	// log.SetLevel(log.DebugLevel)
+	eventsMapping["test"] = testFunc
+	// eventsMapping["giveSnack"] = GiveSnack
+	eventsMapping["guessLeft"] = GuessLeft
+	eventsMapping["guessRight"] = GuessRight
+	// eventsMapping["givePet"] = GiveLove
 }
+
+func testFunc(message WSMessage) (err error) {
+	return
+}
+
+
+
+func GiveMeal(message WSMessage) (err error) {
+	return
+}
+
+
 
 func main() {
 	go StartWSS()
@@ -27,7 +44,6 @@ func main() {
 	go OauthWebInterface()
 	<-StartGotchiChan
 	Started = true
-	internalService = newService(*extensionId, userId, secret)
 	<-IsReadyToHatchChan
 	thisGotchi.ReadyToHatch = true
 	<-HatchChan
@@ -97,7 +113,7 @@ func ProcessBitsEvent(message WSMessage) (err error) {
 func ProcessSubscribeEvent(message WSMessage) (err error) {
 	return
 }
-
 func ProcessPointsEvent(message WSMessage) (err error) {
+	log.Debugf("%v", message)
 	return
 }
